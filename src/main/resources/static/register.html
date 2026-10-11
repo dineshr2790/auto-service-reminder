@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Oil Service Registration</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px 14px;
+            font-family: Arial, sans-serif;
+            background: #f3f5f8;
+            color: #202938;
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #606b7a;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd2dc;
+            border-radius: 7px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .consent {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .consent input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 14px;
+            border: none;
+            border-radius: 7px;
+            background: #1769aa;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #8995a3;
+            cursor: not-allowed;
+        }
+
+        #message {
+            display: none;
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 7px;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .success {
+            display: block !important;
+            background: #e7f7ed;
+            color: #176534;
+        }
+
+        .error {
+            display: block !important;
+            background: #fff0f0;
+            color: #a32020;
+        }
+
+        .note {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #606b7a;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Bike Oil Service</h1>
+
+    <p class="subtitle">
+        Register your oil purchase to help us remind you
+        when your next oil service may be due.
+    </p>
+
+    <form id="registrationForm">
+        <label for="name">Customer name *</label>
+        <input id="name" name="name" type="text"
+               maxlength="100" required autocomplete="name">
+
+        <label for="mobileNumber">Mobile number *</label>
+        <input id="mobileNumber" name="mobileNumber"
+               type="tel" maxlength="20" required
+               autocomplete="tel" placeholder="Enter mobile number">
+
+        <label for="location">Village / Location</label>
+        <input id="location" name="location" type="text"
+               maxlength="150" autocomplete="address-level2">
+
+        <label for="vehicleNumber">Vehicle registration number *</label>
+        <input id="vehicleNumber" name="vehicleNumber"
+               type="text" maxlength="20" required
+               placeholder="e.g. TN 01 AB 1234">
+
+        <label for="vehicleType">Vehicle type *</label>
+        <select id="vehicleType" name="vehicleType" required>
+            <option value="Bike">Bike</option>
+            <option value="Scooter">Scooter</option>
+        </select>
+
+        <label for="vehicleBrand">Vehicle brand</label>
+        <input id="vehicleBrand" name="vehicleBrand"
+               type="text" maxlength="80"
+               placeholder="e.g. Honda, TVS, Hero">
+
+        <label for="serviceDate">Oil purchase / service date *</label>
+        <input id="serviceDate" name="serviceDate"
+               type="date" required>
+
+        <label for="oilBrand">Oil brand *</label>
+        <input id="oilBrand" name="oilBrand"
+               type="text" maxlength="80" required
+               placeholder="e.g. Castrol">
+
+        <label for="amountPaid">Amount paid (₹)</label>
+        <input id="amountPaid" name="amountPaid"
+               type="number" min="0" step="0.01"
+               placeholder="e.g. 450">
+
+        <label for="odometerKm">Current odometer reading (km)</label>
+        <input id="odometerKm" name="odometerKm"
+               type="number" min="0" step="1"
+               placeholder="Optional">
+
+        <label class="consent">
+            <input id="reminderConsent" name="reminderConsent"
+                   type="checkbox">
+            <span>
+                I agree to receive service reminders and relevant
+                offers through WhatsApp on the mobile number provided.
+            </span>
+        </label>
+
+        <button id="submitButton" type="submit">
+            Register Oil Purchase
+        </button>
+
+        <div id="message" role="status" aria-live="polite"></div>
+    </form>
+
+    <p class="note">
+        Your details will be used to record this service and, if you
+        consent, send service reminders. Reminder timing is an estimate;
+        follow your vehicle manufacturer's service recommendations.
+    </p>
+</div>
+
+<script>
+    const form = document.getElementById("registrationForm");
+    const submitButton = document.getElementById("submitButton");
+    const messageBox = document.getElementById("message");
+
+    // Default the service date to today.
+    const today = new Date();
+    const localDate = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0")
+    ].join("-");
+
+    document.getElementById("serviceDate").value = localDate;
+
+    function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.className = type;
+    }
+
+    async function postJson(url, data) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const responseText = await response.text();
+        let responseBody = {};
+
+        if (responseText) {
+            try {
+                responseBody = JSON.parse(responseText);
+            } catch {
+                responseBody = { detail: responseText };
+            }
+        }
+
+        if (!response.ok) {
+            const detail =
+                responseBody.detail ||
+                responseBody.message ||
+                responseBody.title ||
+                `Request failed with status ${response.status}`;
+
+            const validationErrors = responseBody.errors
+                ? " " + Object.entries(responseBody.errors)
+                .map(([field, error]) => `${field}: ${error}`)
+                .join("; ")
+                : "";
+
+            throw new Error(detail + validationErrors);
+        }
+
+        return responseBody;
+    }
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Registering...";
+        messageBox.className = "";
+        messageBox.style.display = "none";
+
+        const customerRequest = {
+            name: document.getElementById("name").value.trim(),
+            mobileNumber: document.getElementById("mobileNumber").value.trim(),
+            location: document.getElementById("location").value.trim() || null,
+            reminderConsent:
+            document.getElementById("reminderConsent").checked,
+            vehicle: {
+                vehicleNumber: document.getElementById("vehicleNumber")
+                    .value.trim().toUpperCase(),
+                vehicleType: document.getElementById("vehicleType").value,
+                vehicleBrand: document.getElementById("vehicleBrand")
+                    .value.trim() || null
+            }
+        };
+
+        const serviceDate =
+            document.getElementById("serviceDate").value;
+
+        const serviceRequest = {
+            serviceDate: serviceDate,
+            oilBrand: document.getElementById("oilBrand").value.trim(),
+            odometerKm:
+                document.getElementById("odometerKm").value === ""
+                    ? null
+                    : Number(document.getElementById("odometerKm").value),
+            amountPaid:
+                document.getElementById("amountPaid").value === ""
+                    ? null
+                    : Number(document.getElementById("amountPaid").value)
+        };
+
+
+        try {
+            const result = await postJson(
+                "/api/registrations",
+                {
+                    ...customerRequest,
+                    ...serviceRequest
+                }
+            );
+
+            showMessage(
+                `Registration successful! Thank you, ${result.name}. ` +
+                `Vehicle: ${result.vehicleNumber}. ` +
+                `Next reminder date: ${result.nextReminderDate}. ` +
+                (customerRequest.reminderConsent
+                    ? "Your reminder consent has been recorded."
+                    : "You have not opted in to WhatsApp reminders."),
+                "success"
+            );
+
+            form.reset();
+            document.getElementById("serviceDate").value = localDate;
+
+        } catch (error) {
+            console.error("Registration error:", error);
+
+            showMessage(
+                "Registration failed: " + error.message +
+                ". Please check the records before trying again.",
+                "error"
+            );
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Register Oil Purchase";
+        }
+
+
+    });
+</script>
+</body>
+</html>

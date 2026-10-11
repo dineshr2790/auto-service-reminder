@@ -1,0 +1,14 @@
+
+.gradle/
+build/
+out/
+.idea/
+*.iml
+*.log
+
+.env
+.env.*
+!.env.example
+
+application-local.yml
+application-secrets.yml
